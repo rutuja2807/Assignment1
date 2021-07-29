@@ -1,0 +1,63 @@
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+article_list = [ ]
+
+app.route('/articles', methods=['GET, POST'])
+def articles():
+    if request.method == 'GET':
+        if len(article_list) > 0:
+            return jsonify(article_list)
+        else:
+            "Nothing found", 404
+
+    if request.method == 'POST':
+        new_title = request.form['title']
+        new_description = request.form['description']
+        new_author = request.form['author']
+        ID = article_list[-1] ['id']+1
+
+        new_obj = {
+           'id' : ID,
+           'title' : new_title,
+           'description' : new_description,
+           'author' : new_author
+        }
+
+    article_list.append(new_obj)
+    return jsonify(article_list), 201
+
+@app.route('/article/<int:id>', methods=['GET','PUT','DELETE'])
+def one_article(id):
+    if request.method == 'GET':
+        for article in article_list:
+            if article['id'] == id:
+                return jsonify(article)
+            pass
+
+    if request.method == 'PUT':
+        for article in article_list:
+            if article['id'] == id:
+                article['title'] = request.form['author']
+                article['description'] = request.form['description']
+                article['author'] = request.form['author']
+
+                updated_article = {
+                    'id': id,
+                    'title': article['title'],
+                    'description': article['description'],
+                    'author': article['author']
+                }
+
+                return jsonify(updated_article)
+
+    if request.method == 'DELETE':
+        for index, article in enumerate(article_list):
+            if article[id] == id:
+                article_list.pop(index)
+                return jsonify(article_list)
+
+
+if __name__ == '__main__':
+    app.run()
